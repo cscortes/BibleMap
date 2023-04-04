@@ -1,4 +1,4 @@
-use polars::prelude::*;
+//use polars::prelude::*;
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
@@ -55,19 +55,19 @@ fn find_list_books(lines: &Vec<String>) -> Vec<&String>
     // println!("nt {}", nt);
     // println!("ent {}", ent);
 
-    let mut otbooks = &lines[ot+1..nt].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
-    let mut ntbooks = &lines[nt+1..ent].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
+    let mut otbooks = lines[ot+1..nt].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
+    let ntbooks = lines[nt+1..ent].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
 
     println!("\nBooks in the OT: {}", otbooks.len());
     for (idx,book) in otbooks.iter().enumerate()
     {
-        println!("{}: {}", idx + 1, book);
+        println!("\t{}: {}", idx + 1, book);
     }
 
     println!("\nBooks in the NT: {}", ntbooks.len());
     for (idx,book) in ntbooks.iter().enumerate()
     {
-        println!("{}: {}", idx + 1, book);
+        println!("\t{}: {}", idx + 1, book);
     }
 
     otbooks.extend(ntbooks.iter());
@@ -76,13 +76,13 @@ fn find_list_books(lines: &Vec<String>) -> Vec<&String>
 
 fn main() {
     // Define a regular expression to match the book, chapter, and verse numbers
-    let lines = read_text("genesis.txt");
+    let lines = read_text("pg10.txt");
     // println!("{:?}", lines);
 
-    let rows = line_by_line(&lines);
+    let _rows = line_by_line(&lines);
     // println!("{:?}", rows);
 
-    let books = find_list_books(&lines);
+    let _books = find_list_books(&lines);
 
     // println!("List of Books: {:?}", books);
 
