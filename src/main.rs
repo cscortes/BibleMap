@@ -47,13 +47,11 @@ fn line_by_line(lines: &Vec<String>) -> Vec<(&str, i32, i32, &str)>
 
 fn find_list_books(lines: &Vec<String>) -> Vec<&String>
 {
+    // Finds the list of Old and New Testament books
+
     let ot  = start_of("The Old Testament of the King James Version of the Bible", lines, 0);
     let nt  = start_of("The New Testament of the King James Bible", lines, ot);
     let ent = start_of("The Old Testament of the King James Version of the Bible", lines, nt);
-
-    // println!("ot {}", ot);
-    // println!("nt {}", nt);
-    // println!("ent {}", ent);
 
     let mut otbooks = lines[ot+1..nt].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
     let ntbooks = lines[nt+1..ent].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
@@ -77,17 +75,17 @@ fn find_list_books(lines: &Vec<String>) -> Vec<&String>
 fn main() {
     // Define a regular expression to match the book, chapter, and verse numbers
     let lines = read_text("pg10.txt");
-    // println!("{:?}", lines);
-
     let _rows = line_by_line(&lines);
-    // println!("{:?}", rows);
-
     let _books = find_list_books(&lines);
+
+
+    // Find Text, between "books",
+    // need to know where the first books (line (indexes))
 
     // println!("List of Books: {:?}", books);
 
     // Iterate over the lines, extracting the matching text and creating a Polars DataFrame
-    //let df = DataFrame::new(rows).unwrap();
+    // let df = DataFrame::new(rows).unwrap();
     
     // Search for Genesis 1:10 in the DataFrame and print the result
     // let search = df.filter(col("column0").eq("Genesis").and(col("column1").eq(1)).and(col("column2").eq(10)))?;
