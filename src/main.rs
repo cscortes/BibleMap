@@ -2,27 +2,42 @@
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+#[derive(Debug)]
+struct BookIndex {
+    is_book: bool,
+    title: String,
+    line_num: usize,
+    bidx: usize,    
+}
 
-fn read_text(fname: &str) -> Vec<String> {
+fn read_text(fname: &str) -> Vec<String> 
+{
     let ofile = File::open( fname ).expect("Error: File error!");
     let reader = BufReader::new(ofile);
-    
     reader.lines().map(|line| line.unwrap()).collect()
 }
 
-fn start_of(marker: &str, lines: &Vec<String>, start: usize) -> usize 
+fn normalize_string(word: &String) -> String 
 {
-    for (idx,line) in lines.iter().enumerate()
+    let listwords: Vec<_> = word
+                .split(" ")
+                .filter(|&x| x.len() > 0)
+                .collect();
+
+    listwords.join(" ")
+}
+
+fn start_of(marker: &str, lines: &[String], start: usize) -> usize 
+{
+    for idx in start..lines.len()
     {
-        if idx < start 
-        {
-            continue;
-        }
-        if line.starts_with(marker)
+        let line = lines.iter().nth(idx).unwrap();
+        if marker.eq(normalize_string(line).as_str())
         {
             return idx;
         }
     }
+    // Return Invalid Value
     lines.len()
 }
 
@@ -45,13 +60,18 @@ fn line_by_line(lines: &Vec<String>) -> Vec<(&str, i32, i32, &str)>
     rows
 }
 
-fn find_list_books(lines: &Vec<String>) -> Vec<&String>
+fn find_list_books(lines: &[String]) -> Vec<BookIndex>
 {
+    let mut books = Vec::new(); 
     // Finds the list of Old and New Testament books
 
     let ot  = start_of("The Old Testament of the King James Version of the Bible", lines, 0);
     let nt  = start_of("The New Testament of the King James Bible", lines, ot);
     let ent = start_of("The Old Testament of the King James Version of the Bible", lines, nt);
+
+    books.push(BookIndex { is_book: false, title: "Start Old Testament".to_owned(), line_num: ot, bidx: 1 });
+    books.push(BookIndex { is_book: false, title: "Start New Testament".to_owned(), line_num: nt, bidx: 2 });
+    books.push(BookIndex { is_book: false, title: "End New Testament".to_owned(), line_num: ent, bidx: 3 });
 
     let mut otbooks = lines[ot+1..nt].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
     let ntbooks = lines[nt+1..ent].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
@@ -60,29 +80,65 @@ fn find_list_books(lines: &Vec<String>) -> Vec<&String>
     for (idx,book) in otbooks.iter().enumerate()
     {
         println!("\t{}: {}", idx + 1, book);
+        books.push(BookIndex { is_book: true, title: book.to_string(), line_num: 0, bidx: idx + 1 });
     }
 
     println!("\nBooks in the NT: {}", ntbooks.len());
     for (idx,book) in ntbooks.iter().enumerate()
     {
         println!("\t{}: {}", idx + 1, book);
+        books.push(BookIndex { is_book: true, title: book.to_string(), line_num: 0, bidx: idx + 1 });
     }
 
-    otbooks.extend(ntbooks.iter());
-    otbooks
+    books
+}
+
+fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>)  
+{
+    let mut ent = lines.len();
+
+    // find line_num by book == false and bidx == 3
+    for book in book_indexes.as_slice()
+    {
+        if (book.bidx == 3) && (book.is_book == false) 
+        {
+            ent = book.line_num;
+            break;
+        }
+    }
+
+    // previous code should have found the "end of list of books"
+    assert!(ent != lines.len());
+
+
+    let first = ent;
+
+    for book in book_indexes.as_slice()
+    {
+        if book.is_book == false
+        {
+            continue;
+        }
+
+        let next = start_of(book.title.as_str(), lines, first);
+        println!("Next line number {} : {}", next, book.title);
+
+    }
+
+
 }
 
 fn main() {
     // Define a regular expression to match the book, chapter, and verse numbers
     let lines = read_text("pg10.txt");
     let _rows = line_by_line(&lines);
-    let _books = find_list_books(&lines);
 
+    let mut book_indexes = find_list_books(&lines);
+    println!("List of Books: {:?}", book_indexes);
 
     // Find Text, between "books",
     // need to know where the first books (line (indexes))
-
-    // println!("List of Books: {:?}", books);
+    book_texts(&lines, &mut book_indexes);
 
     // Iterate over the lines, extracting the matching text and creating a Polars DataFrame
     // let df = DataFrame::new(rows).unwrap();
