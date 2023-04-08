@@ -2,12 +2,28 @@
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+
 #[derive(Debug)]
 struct BookIndex {
     is_book: bool,
     title: String,
     line_num: usize,
     bidx: usize,    
+}
+
+#[derive(Debug)]
+struct VerseInfo {
+    chapter: usize,
+    verse: usize,
+    text: String
+}
+
+#[derive(Debug)]
+struct TextIndex {
+    start_num: usize,
+    end_num: usize,
+    body_text: String,
+    verses: Vec<VerseInfo>
 }
 
 fn read_text(fname: &str) -> Vec<String> 
@@ -34,7 +50,7 @@ fn start_of(marker: &str, lines: &[String], start: usize) -> usize
         let line = lines.iter().nth(idx).unwrap();
         if marker.eq(normalize_string(line).as_str())
         {
-            return idx;
+            return idx+1;
         }
     }
     // Return Invalid Value
@@ -68,13 +84,17 @@ fn find_list_books(lines: &[String]) -> Vec<BookIndex>
     let ot  = start_of("The Old Testament of the King James Version of the Bible", lines, 0);
     let nt  = start_of("The New Testament of the King James Bible", lines, ot);
     let ent = start_of("The Old Testament of the King James Version of the Bible", lines, nt);
+    let end = start_of("*** END OF THE PROJECT GUTENBERG EBOOK THE KING JAMES BIBLE ***", lines, ent);
 
-    books.push(BookIndex { is_book: false, title: "Start Old Testament".to_owned(), line_num: ot, bidx: 1 });
-    books.push(BookIndex { is_book: false, title: "Start New Testament".to_owned(), line_num: nt, bidx: 2 });
-    books.push(BookIndex { is_book: false, title: "End New Testament".to_owned(), line_num: ent, bidx: 3 });
+    books.push(BookIndex { is_book: false, title: "Start Old Testament Books".to_owned(), line_num: ot, bidx: 1 });
+    books.push(BookIndex { is_book: false, title: "Start New Testament Books".to_owned(), line_num: nt, bidx: 2 });
+    books.push(BookIndex { is_book: false, title: "End New Testament Books".to_owned(), line_num: ent, bidx: 3 });
+    books.push(BookIndex { is_book: false, title: "End Bible Text".to_owned(), line_num: end, bidx: 4 });
 
-    let mut otbooks = lines[ot+1..nt].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
-    let ntbooks = lines[nt+1..ent].iter().filter(|s| s.len() > 0).collect::<Vec<&String>>();
+    let otbooks = lines[ot..nt-1].iter()
+                .filter(|s| s.len() > 0).collect::<Vec<&String>>();
+    let ntbooks = lines[nt..ent-1].iter()
+                .filter(|s| s.len() > 0).collect::<Vec<&String>>();
 
     println!("\nBooks in the OT: {}", otbooks.len());
     for (idx,book) in otbooks.iter().enumerate()
@@ -93,37 +113,65 @@ fn find_list_books(lines: &[String]) -> Vec<BookIndex>
     books
 }
 
-fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>)  
+fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>, text_indexes: &mut Vec<TextIndex>)  
 {
     let mut ent = lines.len();
+    let mut end = lines.len();
 
     // find line_num by book == false and bidx == 3
     for book in book_indexes.as_slice()
     {
-        if (book.bidx == 3) && (book.is_book == false) 
+        if book.is_book == false
         {
-            ent = book.line_num;
-            break;
+            if book.bidx == 3
+            {
+                ent = book.line_num;
+            }
+            if book.bidx == 4
+            {
+                end = book.line_num;
+                break;
+            }
         }
     }
 
     // previous code should have found the "end of list of books"
     assert!(ent != lines.len());
 
+    let mut realbooks : Vec<&mut BookIndex> = book_indexes.iter_mut()
+            .filter(|b| b.is_book)
+            .collect();
 
-    let first = ent;
-
-    for book in book_indexes.as_slice()
+    // Find all line numbers of books
+    let mut first = ent;
+    for book in realbooks.iter_mut()
     {
-        if book.is_book == false
-        {
-            continue;
-        }
-
         let next = start_of(book.title.as_str(), lines, first);
         println!("Next line number {} : {}", next, book.title);
-
+        book.line_num = next;
+        first = next+1;
     }
+
+    for idx in 0..realbooks.len()-1
+    {
+        let book = realbooks.iter().nth(idx).unwrap();
+        let next_book = realbooks.iter().nth(idx+1).unwrap();
+
+        text_indexes.push(TextIndex { start_num: book.line_num, 
+            end_num: next_book.line_num, body_text: "".to_owned(), Vec<VerseInfo>::new() });
+    }
+
+    let last = realbooks.iter().last().unwrap();
+    text_indexes.push(TextIndex { start_num: last.line_num, 
+        end_num: end, body_text: "".to_owned() });
+
+    // find text
+    for text_idx in text_indexes.iter_mut()
+    {
+        text_idx.body_text = lines[text_idx.start_num+1..text_idx.end_num-1].join("\n");
+        // println!("{}", text_idx.verses);
+    }
+
 
 
 }
@@ -134,11 +182,13 @@ fn main() {
     let _rows = line_by_line(&lines);
 
     let mut book_indexes = find_list_books(&lines);
-    println!("List of Books: {:?}", book_indexes);
 
     // Find Text, between "books",
     // need to know where the first books (line (indexes))
-    book_texts(&lines, &mut book_indexes);
+    let mut text_indexes = Vec::new();
+    book_texts(&lines, &mut book_indexes, &mut text_indexes);
+
+    println!("{:?}", text_indexes);
 
     // Iterate over the lines, extracting the matching text and creating a Polars DataFrame
     // let df = DataFrame::new(rows).unwrap();
