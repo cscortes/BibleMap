@@ -57,24 +57,6 @@ fn start_of(marker: &str, lines: &[String], start: usize) -> usize
     lines.len()
 }
 
-fn line_by_line(lines: &Vec<String>) -> Vec<(&str, i32, i32, &str)> 
-{
-    let re = Regex::new(r"(?P<book>\w+)\s+(?P<chapter>\d+):(?P<verse>\d+)\s*(?P<text>.+^\n)").unwrap();
-    let mut rows = Vec::new();
-
-    for line in lines 
-    {
-        if let Some(captures) = re.captures(&line) 
-        {
-            let book = captures.name("book").unwrap().as_str();
-             let chapter = captures.name("chapter").unwrap().as_str().parse::<i32>().unwrap();
-            let verse = captures.name("verse").unwrap().as_str().parse::<i32>().unwrap();
-            let text = captures.name("text").unwrap().as_str();
-            rows.push((book, chapter, verse, text));
-        }
-    }
-    rows
-}
 
 fn find_list_books(lines: &[String]) -> Vec<BookIndex>
 {
@@ -206,13 +188,12 @@ fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>) -> Vec<TextI
 fn main() {
     // Define a regular expression to match the book, chapter, and verse numbers
     let lines = read_text("pg10.txt");
-    let _rows = line_by_line(&lines);
 
     let mut book_indexes = find_list_books(&lines);
 
     // Find Text, between "books",
     // need to know where the first books (line (indexes))
-    let mut text_indexes = book_texts(&lines, &mut book_indexes);
+    let text_indexes = book_texts(&lines, &mut book_indexes);
 
 
     // Final Output
