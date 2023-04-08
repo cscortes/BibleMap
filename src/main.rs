@@ -113,8 +113,10 @@ fn find_list_books(lines: &[String]) -> Vec<BookIndex>
     books
 }
 
-fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>, text_indexes: &mut Vec<TextIndex>)  
+fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>) -> Vec<TextIndex>  
 {
+    let mut text_indexes = Vec::new();
+
     let mut ent = lines.len();
     let mut end = lines.len();
 
@@ -147,7 +149,7 @@ fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>, text_indexes
     for book in realbooks.iter_mut()
     {
         let next = start_of(book.title.as_str(), lines, first);
-        println!("Next line number {} : {}", next, book.title);
+        // println!("Next line number {} : {}", next, book.title);
         book.line_num = next;
         first = next+1;
     }
@@ -157,23 +159,48 @@ fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>, text_indexes
         let book = realbooks.iter().nth(idx).unwrap();
         let next_book = realbooks.iter().nth(idx+1).unwrap();
 
-        text_indexes.push(TextIndex { start_num: book.line_num, 
-            end_num: next_book.line_num, body_text: "".to_owned(), Vec<VerseInfo>::new() });
+        text_indexes.push(TextIndex { 
+            start_num: book.line_num, 
+            end_num: next_book.line_num,
+            body_text: "".to_owned(),
+            verses: Vec::new() });
     }
 
     let last = realbooks.iter().last().unwrap();
-    text_indexes.push(TextIndex { start_num: last.line_num, 
-        end_num: end, body_text: "".to_owned() });
+    text_indexes.push(TextIndex { 
+        start_num: last.line_num, 
+        end_num: end, 
+        body_text: "".to_owned(),
+        verses: Vec::new()
+    });
 
     // find text
     for text_idx in text_indexes.iter_mut()
     {
-        text_idx.body_text = lines[text_idx.start_num+1..text_idx.end_num-1].join("\n");
+        text_idx.body_text = lines[text_idx.start_num+1..text_idx.end_num-1].join(" ");
         // println!("{}", text_idx.verses);
     }
 
+    let cv_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)").unwrap();
+    let cvm_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)\s*(?P<text>[^~]+)").unwrap();
 
+    // find verses
+    for text_idx in text_indexes.iter_mut()
+    {
+        let mut body =cv_pat.replace_all(&text_idx.body_text, "~${chapter}:${verse}");
+        body += "~";
 
+        for cap in cvm_pat.captures_iter(&body)
+        {            
+            text_idx.verses.push(VerseInfo {
+                chapter: cap.name("chapter").unwrap().as_str().parse::<usize>().unwrap(),
+                verse: cap.name("verse").unwrap().as_str().parse::<usize>().unwrap(),
+                text: cap.name("text").unwrap().as_str().to_string(),
+            });
+        }
+    }
+
+    text_indexes
 }
 
 fn main() {
@@ -185,10 +212,27 @@ fn main() {
 
     // Find Text, between "books",
     // need to know where the first books (line (indexes))
-    let mut text_indexes = Vec::new();
-    book_texts(&lines, &mut book_indexes, &mut text_indexes);
+    let mut text_indexes = book_texts(&lines, &mut book_indexes);
 
-    println!("{:?}", text_indexes);
+
+    // Final Output
+    for book in book_indexes.iter()
+    {
+        for tex in text_indexes.iter()
+        {
+            if (book.line_num == tex.start_num) 
+            {
+                println!("\n{}",book.title);
+                for vinfo in tex.verses.iter()
+                {
+                    println!("{}:{} {}", vinfo.chapter, vinfo.verse, vinfo.text);
+                }
+            }
+        }
+
+    }
+
+
 
     // Iterate over the lines, extracting the matching text and creating a Polars DataFrame
     // let df = DataFrame::new(rows).unwrap();
