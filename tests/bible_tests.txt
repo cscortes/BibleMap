@@ -1,4 +1,4 @@
-﻿T~ The First Book of Moses: Called Genesis
+T~ The First Book of Moses: Called Genesis
 
 1:1 In the beginning God created the heaven and the earth.
 1:2 And the earth was without form, and void; and darkness was upon the face of the deep. And the Spirit of God moved upon the face of the waters.
@@ -19,17 +19,17 @@ T~ The Second Book of Moses: Called Exodus
 40:36 And when the cloud was taken up from over the tabernacle, the children of Israel went onward in all their journeys: 40:37 But if the cloud were not taken up, then they journeyed not till the day that it was taken up.
 40:38 For the cloud of the LORD was upon the tabernacle by day, and fire was on it by night, in the sight of all the house of Israel, throughout all their journeys.
 
-T~ The Third Book of Moses:  Called Leviticus
+T~ The Third Book of Moses: Called Leviticus
 
 1:1 And the LORD called unto Moses, and spake unto him out of the tabernacle of the congregation, saying, 1:2 Speak unto the children of Israel, and say unto them, If any man of you bring an offering unto the LORD, ye shall bring your offering of the cattle, even of the herd, and of the flock.
 27:34 These are the commandments, which the LORD commanded Moses for the children of Israel in mount Sinai.
 
-T~ The Fourth Book of Moses:  Called Numbers
+T~ The Fourth Book of Moses: Called Numbers
 
 1:1 And the LORD spake unto Moses in the wilderness of Sinai, in the tabernacle of the congregation, on the first day of the second month, in the second year after they were come out of the land of Egypt, saying, 1:2 Take ye the sum of all the congregation of the children of Israel, after their families, by the house of their fathers, with the number of their names, every male by their polls; 1:3 From twenty years old and upward, all that are able to go forth to war in Israel: thou and Aaron shall number them by their armies.
 36:13 These are the commandments and the judgments, which the LORD commanded by the hand of Moses unto the children of Israel in the plains of Moab by Jordan near Jericho.
 
-T~ The Fifth Book of Moses:  Called Deuteronomy
+T~ The Fifth Book of Moses: Called Deuteronomy
 
 1:1 These be the words which Moses spake unto all Israel on this side Jordan in the wilderness, in the plain over against the Red sea, between Paran, and Tophel, and Laban, and Hazeroth, and Dizahab.
 34:10 And there arose not a prophet since in Israel like unto Moses, whom the LORD knew face to face, 34:11 In all the signs and the wonders, which the LORD sent him to do in the land of Egypt to Pharaoh, and to all his servants, and to all his land, 34:12 And in all that mighty hand, and in all the great terror which Moses shewed in the sight of all Israel.
