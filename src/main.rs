@@ -2,6 +2,7 @@
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
+use std::iter::zip;
 
 #[derive(Debug)]
 struct BookIndex {
@@ -11,7 +12,7 @@ struct BookIndex {
     bidx: usize,    
 }
 
-#[derive(Debug)]
+#[derive(Clone,Debug)]
 struct VerseInfo {
     chapter: usize,
     verse: usize,
@@ -57,7 +58,6 @@ fn start_of(marker: &str, lines: &[String], start: usize) -> usize
     lines.len()
 }
 
-
 fn find_list_books(lines: &[String]) -> Vec<BookIndex>
 {
     let mut books = Vec::new(); 
@@ -98,9 +98,10 @@ fn find_list_books(lines: &[String]) -> Vec<BookIndex>
 fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>) -> Vec<TextIndex>  
 {
     let mut text_indexes = Vec::new();
-
     let mut ent = lines.len();
     let mut end = lines.len();
+    let cv_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)").unwrap();
+    let cvm_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)\s*(?P<text>[^~]+)").unwrap();
 
     // find line_num by book == false and bidx == 3
     for book in book_indexes.as_slice()
@@ -141,11 +142,20 @@ fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>) -> Vec<TextI
         let book = realbooks.iter().nth(idx).unwrap();
         let next_book = realbooks.iter().nth(idx+1).unwrap();
 
+
+        let mut next_book = next_book.line_num;
+
+        if book.title.contains("Malachi")
+        {
+            next_book -= 12;
+        }
+
         text_indexes.push(TextIndex { 
             start_num: book.line_num, 
-            end_num: next_book.line_num,
+            end_num: next_book,
             body_text: "".to_owned(),
-            verses: Vec::new() });
+            verses: Vec::new() 
+        });
     }
 
     let last = realbooks.iter().last().unwrap();
@@ -160,11 +170,7 @@ fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>) -> Vec<TextI
     for text_idx in text_indexes.iter_mut()
     {
         text_idx.body_text = lines[text_idx.start_num+1..text_idx.end_num-1].join(" ");
-        // println!("{}", text_idx.verses);
     }
-
-    let cv_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)").unwrap();
-    let cvm_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)\s*(?P<text>[^~]+)").unwrap();
 
     // find verses
     for text_idx in text_indexes.iter_mut()
@@ -174,15 +180,179 @@ fn book_texts(lines: &[String], book_indexes : &mut Vec<BookIndex>) -> Vec<TextI
 
         for cap in cvm_pat.captures_iter(&body)
         {            
-            text_idx.verses.push(VerseInfo {
+            let info = VerseInfo {
                 chapter: cap.name("chapter").unwrap().as_str().parse::<usize>().unwrap(),
                 verse: cap.name("verse").unwrap().as_str().parse::<usize>().unwrap(),
-                text: cap.name("text").unwrap().as_str().to_string(),
-            });
+                text: cap.name("text").unwrap().as_str().trim().to_owned(),
+            };
+            text_idx.verses.push(info.clone());
         }
     }
 
     text_indexes
+}
+
+fn findx(t1:&String, t2:&String)
+{
+    // assert!(t1.len() == t2.len());
+
+    println!("t1: {}", t1);
+    println!("t2: {}", t2);
+
+    println!("t1.len == t2.len, {} == {}", t1.len(), t2.len());
+
+    for (c1, c2) in zip(t1.chars(), t2.chars())
+    {
+        println!("c1 == c2, {} == {}", c1, c2);
+        assert!(c1 == c2 );
+    }
+}
+
+// fn search_abc(texts: &Vec<TextIndex>, text: String, chapter: usize, verse: usize, book_line: usize) 
+// {
+//     let mut verse_found = false;
+
+//     let book_texts : Vec<&TextIndex> = texts.iter()
+//         .filter(|t| t.start_num == book_line).collect();
+
+//     assert!(book_texts.len() > 0, "Didn't find texts for this book!");
+
+//     for t in book_texts.iter()
+//     {
+//         if t.body_text.contains(&text)
+//         {
+//             for v in t.verses.iter()
+//             {
+//                 if (chapter != v.chapter) || (verse != v.verse)
+//                 {
+//                     continue;
+//                 }
+//                 println!("VS: [{}]", v.text);
+//                 println!("FV: [{}]", text);
+
+//                 verse_found = (v.text == text);
+//                 if !verse_found
+//                 {
+//                     findx(&v.text, &text);
+//                 }
+                
+//                 break;
+//             }
+//         }
+//         assert!(verse_found == true, "Verse not found!");
+//     }
+// }
+
+#[derive(Debug)]
+struct Test {
+    book: String,
+    verses: Vec<String>
+}
+
+#[derive(Debug)]
+struct TestSuite {
+    tests: Vec<Test>
+}
+
+impl TestSuite {
+    fn new () -> TestSuite {
+
+        // Read file, filter empty lines
+        let alllines = read_text("tests/bible_tests.txt"); 
+        let tlines: Vec<&String> = alllines.iter()
+        .filter(|&line| line.trim().len() >0).collect();
+
+        // init tests
+        let mut tests = Vec::new();
+        // tests.push(Test { book: "first test".to_string(), verses: Vec::new()});
+
+        let mut idx = 0; 
+
+        while idx < tlines.len() 
+        {
+            let mut line = String::from(tlines[idx].trim());
+
+            if line.contains("T~")
+            {
+                let replaced = line.replace("T~", "").to_string();
+                let title = String::from(replaced.trim());
+                let mut t = Test { 
+                    book: title, 
+                    verses: Vec::new()  
+                };
+
+                idx += 1;
+                while idx < tlines.len() && !tlines[idx].contains("T~")
+                {
+                    line = String::from(tlines[idx].trim());
+                    t.verses.push(line);
+                    idx += 1;
+                }
+
+                tests.push(t);
+            }
+        }
+
+        assert!(tests.len() == 66, "Should have 66 books in the KJV!");
+        TestSuite { tests: tests }
+    }
+
+
+    fn run (&self, books: Vec<BookIndex>, texts: &Vec<TextIndex>) 
+    {
+        let cv_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)\s*(?P<text>[^~]+)\s*").unwrap();
+
+        for test in self.tests.iter()
+        {
+            println!("TEST: Search for [{}]", test.book);
+
+            let bookinfo : Vec<&BookIndex> = books.iter()
+                .filter(|b| b.is_book && b.title == test.book)
+                .collect();
+            let thisbook = bookinfo.first().unwrap();
+
+            // should be able to find a book
+            assert!(bookinfo.len() == 1);
+
+            let these_texts : Vec<&TextIndex> = texts.iter()
+            .filter(|&text| text.start_num == thisbook.line_num ).collect();
+
+            // should have many texts 
+            assert!(these_texts.len() == 1);
+            let this_text = these_texts.first().unwrap();
+
+            for iverse in test.verses.iter()
+            {
+                if let Some(cap) = cv_pat.captures(iverse)
+                {
+                    let chapter = cap.name("chapter").unwrap().as_str().parse::<usize>().unwrap();
+                    let verse   = cap.name("verse").unwrap().as_str().parse::<usize>().unwrap();
+                    let text   = String::from(cap.name("text").unwrap().as_str());
+
+                    println!("TEST TEXT: {}", text);
+
+                    let search  = this_text.verses.iter()
+                    .filter(|&v| v.chapter == chapter && v.verse == verse )
+                    .collect::<Vec<&VerseInfo>>();
+
+
+                    assert!( search.len() == 1 );
+
+                    let found = search.first().unwrap();
+
+                    if found.text != text
+                    {
+                        findx(&found.text, &text);
+                        assert!(false, "ERROR: Didn't find test verse!")
+                    }
+                }
+                else {
+                    assert!(false, "Can't find verse!");
+                }
+            }
+
+        }
+    }
 }
 
 fn main() {
@@ -193,10 +363,30 @@ fn main() {
 
     // Find Text, between "books",
     // need to know where the first books (line (indexes))
+    
     let text_indexes = book_texts(&lines, &mut book_indexes);
 
-
     // Final Output
+    // print_bible(&book_indexes, &text_indexes);
+
+    // Tests
+    //// tests(book_indexes, text_indexes);
+
+    let test_suite = TestSuite::new();
+    print!("{:?}", test_suite);
+
+    test_suite.run(book_indexes, &text_indexes);
+
+    // TODO: Use Polars
+    // Iterate over the lines, extracting the matching text and creating a Polars DataFrame
+    // let df = DataFrame::new(rows).unwrap();
+    
+    // Search for Genesis 1:10 in the DataFrame and print the result
+    // let search = df.filter(col("column0").eq("Genesis").and(col("column1").eq(1)).and(col("column2").eq(10)))?;
+    // println!("{:?}", search);
+}
+
+fn print_bible(book_indexes: &Vec<BookIndex>, text_indexes: &Vec<TextIndex>) {
     for book in book_indexes.iter()
     {
         for tex in text_indexes.iter()
@@ -210,15 +400,5 @@ fn main() {
                 }
             }
         }
-
     }
-
-
-
-    // Iterate over the lines, extracting the matching text and creating a Polars DataFrame
-    // let df = DataFrame::new(rows).unwrap();
-    
-    // Search for Genesis 1:10 in the DataFrame and print the result
-    // let search = df.filter(col("column0").eq("Genesis").and(col("column1").eq(1)).and(col("column2").eq(10)))?;
-    // println!("{:?}", search);
 }

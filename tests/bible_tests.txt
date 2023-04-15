@@ -15,24 +15,30 @@ T~ The First Book of Moses: Called Genesis
 T~ The Second Book of Moses: Called Exodus
 
 1:1 Now these are the names of the children of Israel, which came into Egypt; every man and his household came with Jacob.
-1:2 Reuben, Simeon, Levi, and Judah, 1:3 Issachar, Zebulun, and Benjamin, 1:4 Dan, and Naphtali, Gad, and Asher.
-40:36 And when the cloud was taken up from over the tabernacle, the children of Israel went onward in all their journeys: 40:37 But if the cloud were not taken up, then they journeyed not till the day that it was taken up.
+1:2 Reuben, Simeon, Levi, and Judah, 
+1:3 Issachar, Zebulun, and Benjamin, 
+1:4 Dan, and Naphtali, Gad, and Asher.
+40:36 And when the cloud was taken up from over the tabernacle, the children of Israel went onward in all their journeys: 
+40:37 But if the cloud were not taken up, then they journeyed not till the day that it was taken up.
 40:38 For the cloud of the LORD was upon the tabernacle by day, and fire was on it by night, in the sight of all the house of Israel, throughout all their journeys.
 
 T~ The Third Book of Moses: Called Leviticus
 
-1:1 And the LORD called unto Moses, and spake unto him out of the tabernacle of the congregation, saying, 1:2 Speak unto the children of Israel, and say unto them, If any man of you bring an offering unto the LORD, ye shall bring your offering of the cattle, even of the herd, and of the flock.
+1:1 And the LORD called unto Moses, and spake unto him out of the tabernacle of the congregation, saying, 
+1:2 Speak unto the children of Israel, and say unto them, If any man of you bring an offering unto the LORD, ye shall bring your offering of the cattle, even of the herd, and of the flock.
 27:34 These are the commandments, which the LORD commanded Moses for the children of Israel in mount Sinai.
 
 T~ The Fourth Book of Moses: Called Numbers
 
-1:1 And the LORD spake unto Moses in the wilderness of Sinai, in the tabernacle of the congregation, on the first day of the second month, in the second year after they were come out of the land of Egypt, saying, 1:2 Take ye the sum of all the congregation of the children of Israel, after their families, by the house of their fathers, with the number of their names, every male by their polls; 1:3 From twenty years old and upward, all that are able to go forth to war in Israel: thou and Aaron shall number them by their armies.
+1:1 And the LORD spake unto Moses in the wilderness of Sinai, in the tabernacle of the congregation, on the first day of the second month, in the second year after they were come out of the land of Egypt, saying, 
+1:2 Take ye the sum of all the congregation of the children of Israel, after their families, by the house of their fathers, with the number of their names, every male by their polls; 
+1:3 From twenty years old and upward, all that are able to go forth to war in Israel: thou and Aaron shall number them by their armies.
 36:13 These are the commandments and the judgments, which the LORD commanded by the hand of Moses unto the children of Israel in the plains of Moab by Jordan near Jericho.
 
 T~ The Fifth Book of Moses: Called Deuteronomy
 
 1:1 These be the words which Moses spake unto all Israel on this side Jordan in the wilderness, in the plain over against the Red sea, between Paran, and Tophel, and Laban, and Hazeroth, and Dizahab.
-34:10 And there arose not a prophet since in Israel like unto Moses, whom the LORD knew face to face, 34:11 In all the signs and the wonders, which the LORD sent him to do in the land of Egypt to Pharaoh, and to all his servants, and to all his land, 34:12 And in all that mighty hand, and in all the great terror which Moses shewed in the sight of all Israel.
+34:12 And in all that mighty hand, and in all the great terror which Moses shewed in the sight of all Israel.
 
 T~ The Book of Joshua
 
@@ -47,7 +53,7 @@ T~ The Book of Judges
 T~ The Book of Ruth
 
 1:1 Now it came to pass in the days when the judges ruled, that there was a famine in the land. And a certain man of Bethlehemjudah went to sojourn in the country of Moab, he, and his wife, and his two sons.
-4:19 And Hezron begat Ram, and Ram begat Amminadab, 4:20 And Amminadab begat Nahshon, and Nahshon begat Salmon, 4:21 And Salmon begat Boaz, and Boaz begat Obed, 4:22 And Obed begat Jesse, and Jesse begat David.
+4:22 And Obed begat Jesse, and Jesse begat David.
 
 T~ The First Book of Samuel
 
@@ -62,7 +68,7 @@ T~ The Second Book of Samuel
 T~ The First Book of the Kings
 
 1:1 Now king David was old and stricken in years; and they covered him with clothes, but he gat no heat.
-22:52 And he did evil in the sight of the LORD, and walked in the way of his father, and in the way of his mother, and in the way of Jeroboam the son of Nebat, who made Israel to sin: 22:53 For he served Baal, and worshipped him, and provoked to anger the LORD God of Israel, according to all that his father had done.
+22:53 For he served Baal, and worshipped him, and provoked to anger the LORD God of Israel, according to all that his father had done.
 
 T~ The Second Book of the Kings
 
@@ -203,6 +209,7 @@ T~ Zechariah
 T~ Malachi
 
 1:1 The burden of the word of the LORD to Israel by Malachi.
+1:3 And I hated Esau, and laid his mountains and his heritage waste for the dragons of the wilderness.
 4:6 And he shall turn the heart of the fathers to the children, and the heart of the children to their fathers, lest I come and smite the earth with a curse.
 
 T~ The Gospel According to Saint Matthew
@@ -248,12 +255,12 @@ T~ The Second Epistle of Paul the Apostle to the Corinthians
 T~ The Epistle of Paul the Apostle to the Galatians
 
 1:1 Paul, an apostle, (not of men, neither by man, but by Jesus Christ, and God the Father, who raised him from the dead;) 
-6:18 Brethren, the grace of our Lord Jesus Christ be with your spirit. Amen.
+6:18 Brethren, the grace of our Lord Jesus Christ be with your spirit.  Amen.
 
 T~ The Epistle of Paul the Apostle to the Ephesians
 
 1:1 Paul, an apostle of Jesus Christ by the will of God, to the saints which are at Ephesus, and to the faithful in Christ Jesus:
-6:24 Grace be with all them that love our Lord Jesus Christ in sincerity. Amen.
+6:24 Grace be with all them that love our Lord Jesus Christ in sincerity.  Amen.
 
 T~ The Epistle of Paul the Apostle to the Philippians
 
@@ -337,5 +344,6 @@ T~ The General Epistle of Jude
 
 T~ The Revelation of Saint John the Divine
 
-1:1 The Revelation of Jesus Christ, which God gave unto him, to she unto his servants things which must shortly come to pass; and he sen and signified it by his angel unto his servant John: 
+1:1 The Revelation of Jesus Christ, which God gave unto him, to shew unto his servants things which must shortly come to pass; and he sent and signified it by his angel unto his servant John: 
+1:2 Who bare record of the word of God, and of the testimony of Jesus Christ, and of all things that he saw.
 22:21 The grace of our Lord Jesus Christ be with you all. Amen.
