@@ -1,31 +1,17 @@
-//use polars::prelude::*;
 use regex::Regex;
 use std::fs::File;
 use std::io::{BufRead, BufReader};
 use std::iter::zip;
 
-#[derive(Debug)]
-struct BookIndex {
-    is_book: bool,
-    title: String,
-    line_num: usize,
-    bidx: usize,    
-}
+mod common;
 
-#[derive(Clone,Debug)]
-struct VerseInfo {
-    chapter: usize,
-    verse: usize,
-    text: String
-}
+use common::{ TextInfo, Test };
 
-#[derive(Debug)]
-struct TextIndex {
-    start_num: usize,
-    end_num: usize,
-    body_text: String,
-    verses: Vec<VerseInfo>
-}
+mod test_bible_verses;
+use test_bible_verses::TestSuite;
+
+
+
 
 fn read_text(fname: &str) -> Vec<String> 
 {
@@ -208,152 +194,6 @@ fn findx(t1:&String, t2:&String)
     }
 }
 
-// fn search_abc(texts: &Vec<TextIndex>, text: String, chapter: usize, verse: usize, book_line: usize) 
-// {
-//     let mut verse_found = false;
-
-//     let book_texts : Vec<&TextIndex> = texts.iter()
-//         .filter(|t| t.start_num == book_line).collect();
-
-//     assert!(book_texts.len() > 0, "Didn't find texts for this book!");
-
-//     for t in book_texts.iter()
-//     {
-//         if t.body_text.contains(&text)
-//         {
-//             for v in t.verses.iter()
-//             {
-//                 if (chapter != v.chapter) || (verse != v.verse)
-//                 {
-//                     continue;
-//                 }
-//                 println!("VS: [{}]", v.text);
-//                 println!("FV: [{}]", text);
-
-//                 verse_found = (v.text == text);
-//                 if !verse_found
-//                 {
-//                     findx(&v.text, &text);
-//                 }
-                
-//                 break;
-//             }
-//         }
-//         assert!(verse_found == true, "Verse not found!");
-//     }
-// }
-
-#[derive(Debug)]
-struct Test {
-    book: String,
-    verses: Vec<String>
-}
-
-#[derive(Debug)]
-struct TestSuite {
-    tests: Vec<Test>
-}
-
-impl TestSuite {
-    fn new () -> TestSuite {
-
-        // Read file, filter empty lines
-        let alllines = read_text("tests/bible_tests.txt"); 
-        let tlines: Vec<&String> = alllines.iter()
-        .filter(|&line| line.trim().len() >0).collect();
-
-        // init tests
-        let mut tests = Vec::new();
-        // tests.push(Test { book: "first test".to_string(), verses: Vec::new()});
-
-        let mut idx = 0; 
-
-        while idx < tlines.len() 
-        {
-            let mut line = String::from(tlines[idx].trim());
-
-            if line.contains("T~")
-            {
-                let replaced = line.replace("T~", "").to_string();
-                let title = String::from(replaced.trim());
-                let mut t = Test { 
-                    book: title, 
-                    verses: Vec::new()  
-                };
-
-                idx += 1;
-                while idx < tlines.len() && !tlines[idx].contains("T~")
-                {
-                    line = String::from(tlines[idx].trim());
-                    t.verses.push(line);
-                    idx += 1;
-                }
-
-                tests.push(t);
-            }
-        }
-
-        assert!(tests.len() == 66, "Should have 66 books in the KJV!");
-        TestSuite { tests: tests }
-    }
-
-
-    fn run (&self, books: Vec<BookIndex>, texts: &Vec<TextIndex>) 
-    {
-        let cv_pat = Regex::new(r"(?P<chapter>\d+):(?P<verse>\d+)\s*(?P<text>[^~]+)\s*").unwrap();
-
-        for test in self.tests.iter()
-        {
-            println!("TEST: Search for [{}]", test.book);
-
-            let bookinfo : Vec<&BookIndex> = books.iter()
-                .filter(|b| b.is_book && b.title == test.book)
-                .collect();
-            let thisbook = bookinfo.first().unwrap();
-
-            // should be able to find a book
-            assert!(bookinfo.len() == 1);
-
-            let these_texts : Vec<&TextIndex> = texts.iter()
-            .filter(|&text| text.start_num == thisbook.line_num ).collect();
-
-            // should have many texts 
-            assert!(these_texts.len() == 1);
-            let this_text = these_texts.first().unwrap();
-
-            for iverse in test.verses.iter()
-            {
-                if let Some(cap) = cv_pat.captures(iverse)
-                {
-                    let chapter = cap.name("chapter").unwrap().as_str().parse::<usize>().unwrap();
-                    let verse   = cap.name("verse").unwrap().as_str().parse::<usize>().unwrap();
-                    let text   = String::from(cap.name("text").unwrap().as_str());
-
-                    println!("TEST TEXT: {}", text);
-
-                    let search  = this_text.verses.iter()
-                    .filter(|&v| v.chapter == chapter && v.verse == verse )
-                    .collect::<Vec<&VerseInfo>>();
-
-
-                    assert!( search.len() == 1 );
-
-                    let found = search.first().unwrap();
-
-                    if found.text != text
-                    {
-                        findx(&found.text, &text);
-                        assert!(false, "ERROR: Didn't find test verse!")
-                    }
-                }
-                else {
-                    assert!(false, "Can't find verse!");
-                }
-            }
-
-        }
-    }
-}
 
 fn main() {
     // Define a regular expression to match the book, chapter, and verse numbers
@@ -391,7 +231,7 @@ fn print_bible(book_indexes: &Vec<BookIndex>, text_indexes: &Vec<TextIndex>) {
     {
         for tex in text_indexes.iter()
         {
-            if (book.line_num == tex.start_num) 
+            if book.line_num == tex.start_num
             {
                 println!("\n{}",book.title);
                 for vinfo in tex.verses.iter()
