@@ -1,20 +1,20 @@
 #[derive(Debug)]
-struct BookIndex {
-    is_book: bool,
-    title: String,
-    line_num: usize,
-    bidx: usize,    
+pub struct BookIndex {
+    pub bidx: usize,    
+    pub title: String,
+    pub is_book: bool,
+    pub line_num: usize,
 }
 
 #[derive(Clone,Debug)]
-struct VerseInfo {
+pub struct VerseInfo {
     chapter: usize,
     verse: usize,
     text: String
 }    
 
 #[derive(Debug)]
-struct TextIndex {
+pub struct TextIndex {
     start_num: usize,
     end_num: usize,
     body_text: String,
