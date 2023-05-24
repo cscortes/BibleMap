@@ -8,26 +8,27 @@ pub struct BookIndex {
 
 #[derive(Clone,Debug)]
 pub struct VerseInfo {
-    chapter: usize,
-    verse: usize,
-    text: String
+    pub chapter: usize,
+    pub verse: usize,
+    pub text: String
 }    
 
 #[derive(Debug)]
 pub struct TextIndex {
-    start_num: usize,
-    end_num: usize,
-    body_text: String,
-    verses: Vec<VerseInfo>
+    pub start_num: usize,
+    pub end_num: usize,
+    pub body_text: String,
+    pub verses: Vec<VerseInfo>
 }
 
 #[derive(Debug)]
 pub struct Test {
-    book: String,
-    verses: Vec<String>
+    pub book: String,
+    pub verses: Vec<String>
 }
 
 #[derive(Debug)]
 pub struct TestSuite {
-    tests: Vec<Test>
+    pub tests: Vec<Test>
 }
+
